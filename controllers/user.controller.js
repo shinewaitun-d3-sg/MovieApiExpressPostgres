@@ -4,9 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const signUp = async (req, res) => {
   try {
-    console.log(req.body);
     const createdUser = await UserService.signUp(req.body);
-    console.log(createdUser);
     created(res, createdUser);
   } catch (err) {
     error(res, err);
