@@ -1,9 +1,9 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../models");
-const Author = require("../models/authors")(sequelize, DataTypes);
-const Genre = require("../models/genres")(sequelize, DataTypes);
-const Tag = require("../models/tags")(sequelize, DataTypes);
-const Movie = require("../models/movies")(sequelize, DataTypes);
+const Author = require("../models/author")(sequelize, DataTypes);
+const Genre = require("../models/genre")(sequelize, DataTypes);
+const Tag = require("../models/tag")(sequelize, DataTypes);
+const Movie = require("../models/movie")(sequelize, DataTypes);
 
 const create = async (data) => {
   try {
@@ -23,7 +23,7 @@ const create = async (data) => {
       if (genres.length !== data.genreIds.length) {
         throw new Error("Genre IDs are invalid.");
       }
-      await createdMovie.setGenres(genres);
+      await createdMovie.setGenre(genres);
     }
 
     if (data.tagIds && data.tagIds.length > 0) {
@@ -31,7 +31,7 @@ const create = async (data) => {
       if (tags.length !== data.tagIds.length) {
         throw new Error("Tag IDs are invalid.");
       }
-      await createdMovie.setTags(tags);
+      await createdMovie.setTag(tags);
     }
 
     return createdMovie;

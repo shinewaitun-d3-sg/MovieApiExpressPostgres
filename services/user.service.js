@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../models");
 
-const User = require("../models/users")(sequelize, DataTypes);
+const User = require("../models/user")(sequelize, DataTypes);
 
 const signUp = async (data) => {
   try {
