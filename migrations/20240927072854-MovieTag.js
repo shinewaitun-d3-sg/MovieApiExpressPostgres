@@ -5,18 +5,30 @@ const { DataTypes } = require("sequelize");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("MovieTag", {
+    await queryInterface.createTable("MovieTags", {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      movieId: DataTypes.INTEGER,
-      tagId: DataTypes.INTEGER,
+      movieId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "movies",
+          key: "id",
+        },
+      },
+      tagId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "tags",
+          key: "id",
+        },
+      },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("MovieTag");
+    await queryInterface.dropTable("MovieTags");
   },
 };
