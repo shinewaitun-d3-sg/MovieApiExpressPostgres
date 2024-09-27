@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       models.genres.belongsToMany(models.movies, {
         through: "MovieGenre",
-        foreignKey: "movieId",
+        foreignKey: "genreId",
       });
     }
   }
