@@ -15,12 +15,16 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      email: {
-        type: DataTypes.STRING,
+      userId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      movieId: {
+      commentableId: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      commentableType: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
       createdAt: {

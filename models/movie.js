@@ -1,32 +1,41 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class movie extends Model {
+  class Movie extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      models.movie.belongsTo(models.author, {
+      Movie.belongsTo(models.Author, {
         foreignKey: "authorId",
         onDelete: "CASCADE",
       });
-      models.movie.belongsToMany(models.genre, {
-        through: "MovieGenre",
+      Movie.belongsToMany(models.Genre, {
+        through: "MovieGenres",
         foreignKey: "movieId",
+        as: "genres",
+        onDelete: "CASCADE",
       });
-      models.movie.belongsToMany(models.tag, {
-        through: "MovieTag",
+      Movie.belongsToMany(models.Tag, {
+        through: "MovieTags",
         foreignKey: "movieId",
+        as: "tags",
+        onDelete: "CASCADE",
       });
-      models.movie.hasMany(models.comment, {
-        foreignKey: "movieId",
+      Movie.hasMany(models.Comment, {
+        foreignKey: "commentableId",
+        constraints: false,
+        scope: {
+          commentableType: "movie",
+        },
         onDelete: "CASCADE",
       });
     }
   }
-  movie.init(
+
+  Movie.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -48,9 +57,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "movie",
+      modelName: "Movie",
+      tableName: "movies",
       timestamps: true,
     }
   );
-  return movie;
+  return Movie;
 };

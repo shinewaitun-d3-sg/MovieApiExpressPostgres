@@ -1,7 +1,4 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../models");
-
-const User = require("../models/user")(sequelize, DataTypes);
+const User = require("../models").User;
 
 const signUp = async (data) => {
   try {

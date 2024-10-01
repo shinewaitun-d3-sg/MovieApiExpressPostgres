@@ -1,20 +1,33 @@
 "use strict";
 const { Model } = require("sequelize");
+
+const uppercaseFirst = (str) => `${str[0].toUpperCase()}${str.substr(1)}`;
 module.exports = (sequelize, DataTypes) => {
-  class comment extends Model {
+  class Comment extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
+    getCommentable(options) {
+      if (!this.commentableType) return Promise.resolve(null);
+      const mixinMethodName = `get${uppercaseFirst(this.commentableType)}`;
+      return this[mixinMethodName](options);
+    }
+
     static associate(models) {
-      models.comment.belongsTo(models.movie, {
-        foreignKey: "movieId",
+      Comment.belongsTo(models.User, {
+        foreignKey: "userId",
         onDelete: "CASCADE",
+      });
+      Comment.belongsTo(models.Movie, {
+        foreignKey: "commentableId",
+        constraints: false,
       });
     }
   }
-  comment.init(
+
+  Comment.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -25,20 +38,41 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      email: {
-        type: DataTypes.STRING,
+      userId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      movieId: {
+      commentableId: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      commentableType: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: "comment",
+      modelName: "Comment",
+      tableName: "comments",
       timestamps: true,
     }
   );
-  return comment;
+
+  Comment.addHook("afterFind", (findResult) => {
+    if (!Array.isArray(findResult)) findResult = [findResult];
+    for (const instance of findResult) {
+      if (
+        instance.commentableType === "movie" &&
+        instance.movie !== undefined
+      ) {
+        instance.commentable = instance.image;
+      }
+
+      delete instance.movie;
+      delete instance.dataValues.movie;
+    }
+  });
+
+  return Comment;
 };
