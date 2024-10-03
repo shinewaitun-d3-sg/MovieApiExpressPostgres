@@ -35,9 +35,19 @@ const getMovies = async (req, res) => {
 
 const getMovieByPk = async (req, res) => {
   try {
-    const pk = req.params;
-    const movie = await MovieService.getByPk(pk);
+    const { id } = req.params;
+    const movie = await MovieService.getByPk(parseInt(id));
     success(res, movie);
+  } catch (err) {
+    error(res, err);
+  }
+};
+
+const getTopRelatedMovie = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    const relatedMovies = await MovieService.getRelatedMovie(parseInt(movieId));
+    success(res, relatedMovies);
   } catch (err) {
     error(res, err);
   }
@@ -59,4 +69,5 @@ module.exports = {
   getMovies,
   getMovieByPk,
   removeMovie,
+  getTopRelatedMovie,
 };

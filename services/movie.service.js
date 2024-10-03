@@ -4,6 +4,7 @@ const Author = require("../models").Author;
 const Genre = require("../models").Genre;
 const Tag = require("../models").Tag;
 const Movie = require("../models").Movie;
+const { Op } = require("sequelize");
 
 const create = async (data) => {
   try {
@@ -94,6 +95,58 @@ const get = async (page, limit, sortBy, order, criteria) => {
   }
 };
 
+const getRelatedMovie = async (movieId) => {
+  try {
+    const currentMovie = await Movie.findByPk(movieId, {
+      include: [
+        { model: Author, attributes: ["id", "name"] },
+        { model: Genre, as: "genres", attributes: ["id", "name"] },
+        { model: Tag, as: "tags", attributes: ["id", "name"] },
+      ],
+    });
+
+    if (!currentMovie) {
+      return { message: "Movie not found" };
+    }
+
+    const { authorId, genres, tags, imdbRatings } = currentMovie;
+
+    const relatedMovies = await Movie.findAll({
+      where: {
+        id: { [Op.ne]: movieId },
+        [Op.or]: [
+          { authorId: authorId },
+          { imdbRatings: { [Op.between]: [imdbRatings - 1, imdbRatings + 1] } },
+        ],
+      },
+      include: [
+        { model: Author, attributes: ["id", "name"] },
+        {
+          model: Genre,
+          as: "genres",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+          where: { id: genres.map((genre) => genre.id) },
+        },
+        {
+          model: Tag,
+          as: "tags",
+          attributes: ["id", "name"],
+          through: { attributes: [] },
+          where: { id: tags.map((tag) => tag.id) },
+        },
+      ],
+      order: [["imdbRatings", "DESC"]],
+      limit: 7,
+    });
+
+    return relatedMovies;
+  } catch (error) {
+    console.error("Error fetching related movies:", error);
+    return error;
+  }
+};
+
 const getByPk = async (id) => {
   try {
     const movies = await Movie.findByPk({ where: { id: id } });
@@ -113,4 +166,4 @@ const remove = async (id) => {
   }
 };
 
-module.exports = { create, update, get, getByPk, remove };
+module.exports = { create, update, get, getByPk, getRelatedMovie, remove };
