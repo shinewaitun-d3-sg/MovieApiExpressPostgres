@@ -4,14 +4,12 @@ const Role = require("../models").Role;
 const signUp = async (data) => {
   try {
     const createdUser = await User.create(data);
-    if (data.roleIds && data.roleIds.length > 0) {
-      const roles = await Role.findAll({ where: { id: data.roleIds } });
-      if (roles.length !== data.roleIds.length) {
-        throw new Error("Role IDs are invalid.");
-      }
-      await createdUser.addRoles(roles);
+    const roles = await Role.findAll({ where: { name: "USER" } });
+    if (roles.length !== data.roleIds.length) {
+      throw new Error("Role IDs are invalid.");
     }
-    
+    await createdUser.addRoles(roles);
+
     return createdUser;
   } catch (error) {
     return error;
